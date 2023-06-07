@@ -31,12 +31,30 @@ from os import getcwd as gwd
 %G	ISO 8601 year	2018	
 %u	ISO 8601 weekday (1-7)	1	
 %V	ISO 8601 weeknumber (01-53)	01
-"""
+"""                                                                                            
 
-async def log(user: str, t_format: str = "%H %M") -> None:
-    state = "state"
-    directory: str = dirname()
-    cwd_dir: str = gwd()
-    time_ = dt.now().strftime(t_format)
-    log_line: str = f"LOG [{time_}] {user} {state} @ {directory} / {cwd_dir}"
-    return log_line
+class Log:
+    def __init__(self, user: str = "", project: str = "", log_type: str = "LOG", state: str = ""):
+        self.user: str = "N/A" if user == "" else user
+        self.state: str = "N/A" if state == "" else state
+        self.project: str = "N/A" if project == "" else project
+        self.log_type: str = "N/A" if log_type == "" else log_type
+
+    def mklogline(self, user: str, state: str, log_type: str, project: str, t_format: str = "%H:%M") ->  None:
+        cwd_dir: str = gwd()
+        time_ = dt.now().strftime(t_format)
+        log_line: str = f"[{log_type}{state}][{time_}] {user} / {project} @ {cwd_dir}"
+        return log_line
+
+    def log(self, path: str, log_line: str = ""):
+        if log_line == "":
+            log_line = self.mklogline(self.user, self.state, self.log_type, self.project)
+        with open(path, mode = "a+", encoding = "utf8") as f:
+            f.write(log_line + "\n")
+            f.close()
+
+    def __str__(self):
+        return f"—————\nLog class object\nprops:\n\t>user: {self.user}\n\t>state: {self.state}\n\t>project: {self.project}\n\t>tpye: {self.log_type}\n\t@ {gwd()}\n—————"
+
+mylog = Log("me", "this project")
+print(mylog)
