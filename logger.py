@@ -34,27 +34,39 @@ from os import getcwd as gwd
 """                                                                                            
 
 class Log:
+    """"""
+
     def __init__(self, user: str = "", project: str = "", log_type: str = "LOG", state: str = ""):
+
+        """Initializes a Log object all values are set to N/A unless specified in arguments of the initializer"""
         self.user: str = "N/A" if user == "" else user
         self.state: str = "N/A" if state == "" else state
         self.project: str = "N/A" if project == "" else project
         self.log_type: str = "N/A" if log_type == "" else log_type
 
-    def mklogline(self, user: str, state: str, log_type: str, project: str, t_format: str = "%H:%M") ->  None:
+    def mklogline(self, log_type: str = "", state: str = "", user: str = "", project: str = "", t_format: str = "%H:%M") ->  None:
+        """generates a log line from given arguments in pre-defined format or using properties given at initialization"""
+        if log_type == "": log_type = self.log_type 
+        if state == "": state = self.state
+        if user == "": user = self.user
+        if project == "": project = self.project
+    #
         cwd_dir: str = gwd()
         time_ = dt.now().strftime(t_format)
         log_line: str = f"[{log_type}{state}][{time_}] {user} / {project} @ {cwd_dir}"
         return log_line
 
     def log(self, path: str, log_line: str = ""):
+        """writes log line into specifies .tlog file. Makes a log line if none is given"""
         if log_line == "":
-            log_line = self.mklogline(self.user, self.state, self.log_type, self.project)
+            log_line = self.mklogline(self.log_type, self.state, self.user, self.project)
         with open(path, mode = "a+", encoding = "utf8") as f:
             f.write(log_line + "\n")
-            f.close()
 
     def __str__(self):
+        """returns a nicely formatted string version of the object's properties"""
+
         return f"—————\nLog class object\nprops:\n\t>user: {self.user}\n\t>state: {self.state}\n\t>project: {self.project}\n\t>tpye: {self.log_type}\n\t@ {gwd()}\n—————"
 
 mylog = Log("me", "this project")
-print(mylog)
+print(mylog.mklogline())
