@@ -36,13 +36,24 @@ from os import getcwd as gwd
 class Log:
     """"""
 
-    def __init__(self, user: str = "", project: str = "", log_type: str = "LOG", state: str = ""):
+    def __init__(self,
+                 user: str = "",
+                 project: str = "",
+                 log_type: str = "LOG",
+                 state: str = "",
+                 log_path: str = "./tlog/",
+                 log_freq: tuple[int, str] = (1, "day")):
 
         """Initializes a Log object all values are set to N/A unless specified in arguments of the initializer"""
         self.user: str = "N/A" if user == "" else user
         self.state: str = "N/A" if state == "" else state
         self.project: str = "N/A" if project == "" else project
-        self.log_type: str = "N/A" if log_type == "" else log_type
+        # self.log_type has a default
+        self.log_type: str = log_type
+        # self.log_path has a default
+        self.log_path: str = log_path
+        #self.log_freq has a default
+        self.log_freq: tuple[int, str] = log_freq
 
     def mklogline(self, log_type: str = "", state: str = "", user: str = "", project: str = "", t_format: str = "%H:%M") ->  None:
         """generates a log line from given arguments in pre-defined format or using properties given at initialization"""
