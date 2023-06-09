@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+from datetime import timedelta as tdelta
 from os.path import dirname
 from os import getcwd as gwd
 
@@ -34,17 +35,18 @@ from os import getcwd as gwd
 """                                                                                            
 
 class Log:
-    """"""
-
+    """
+    I should write a class description here... hehehe
+    """
     def __init__(self,
                  user: str = "",
                  project: str = "",
                  log_type: str = "LOG",
                  state: str = "",
-                 log_path: str = "./tlog/",
-                 log_freq: tuple[int, str] = (1, "day")):
+                 log_path: str = "./tlog/"):
 
         """Initializes a Log object all values are set to N/A unless specified in arguments of the initializer"""
+
         self.user: str = "N/A" if user == "" else user
         self.state: str = "N/A" if state == "" else state
         self.project: str = "N/A" if project == "" else project
@@ -52,10 +54,23 @@ class Log:
         self.log_type: str = log_type
         # self.log_path has a default
         self.log_path: str = log_path
-        #self.log_freq has a default
-        self.log_freq: tuple[int, str] = log_freq
 
-    def mklogline(self, log_type: str = "", state: str = "", user: str = "", project: str = "", t_format: str = "%H:%M") ->  None:
+    def s_time(time_format: str = '%Y-%d %H:%M:',
+               display_format: str = "{} — {}",
+               range_end: dt | str = dt.now()) -> str:
+        if isinstance(range_end, str):
+            range_end = dt(range_end)
+        now: dt = dt.now()
+        now.microsecond = 0
+        range_end.microsecond = 0
+        if now != range_end:
+            timerange = display_format.format(
+                now.strftime(time_format),
+                range_end.strftime(time_format))
+            return timerange
+        return now.strftime(time_format)
+
+    def mk_log_line(self, log_type: str = "", state: str = "", user: str = "", project: str = "", t_format: str = "%H:%M") ->  None:
         """generates a log line from given arguments in pre-defined format or using properties given at initialization"""
         if log_type == "": log_type = self.log_type 
         if state == "": state = self.state
@@ -63,14 +78,16 @@ class Log:
         if project == "": project = self.project
     #
         cwd_dir: str = gwd()
-        time_ = dt.now().strftime(t_format)
+        time_ = self.s_time(format = t_format)
         log_line: str = f"[{log_type}][{state}][{time_}] {user} / {project} @ {cwd_dir}"
         return log_line
 
-    def log(self, path: str, log_line: str = ""):
+    def log(self, path: str = "", log_line: str = ""):
         """writes log line into specifies .tlog file. Makes a log line if none is given"""
+        if path == "":
+            path = self.log_path        #defaults to predefined path './tlog/'
         if log_line == "":
-            log_line = self.mklogline(self.log_type, self.state, self.user, self.project)
+            log_line = self.mk_log_line(self.log_type, self.state, self.user, self.project)
         with open(path, mode = "a+", encoding = "utf8") as f:
             f.write(log_line + "\n")
 
