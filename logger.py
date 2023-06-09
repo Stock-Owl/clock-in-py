@@ -78,8 +78,8 @@ class Log:
         if project == "": project = self.project
     #
         cwd_dir: str = gwd()
-        time_ = self.s_time(format = t_format)
-        log_line: str = f"[{log_type}][{state}][{time_}] {user} / {project} @ {cwd_dir}"
+        time_:str = self.s_time(format = t_format)
+        log_line: str = f"[{log_type}][{state}][{time_}][{user}]/[{project}]@[{cwd_dir}]\n"
         return log_line
 
     def log(self, path: str = "", log_line: str = ""):
