@@ -53,7 +53,7 @@ class Log:
     #
         cwd_dir: str = gwd()
         time_ = dt.now().strftime(t_format)
-        log_line: str = f"[{log_type}{state}][{time_}] {user} / {project} @ {cwd_dir}"
+        log_line: str = f"[{log_type}][{state}][{time_}] {user} / {project} @ {cwd_dir}"
         return log_line
 
     def log(self, path: str, log_line: str = ""):
