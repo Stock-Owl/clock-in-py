@@ -96,5 +96,3 @@ class Log:
 
         return f"—————\nLog class object\nprops:\n\t>user: {self.user}\n\t>state: {self.state}\n\t>project: {self.project}\n\t>tpye: {self.log_type}\n\t@ {gwd()}\n—————"
 
-mylog = Log("me", "this project")
-print(mylog.mklogline())
