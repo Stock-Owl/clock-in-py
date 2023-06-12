@@ -2,6 +2,7 @@ from datetime import datetime as dt
 from datetime import timedelta as tdelta
 from os.path import dirname
 from os import getcwd as gwd
+from re import findall
 
 """
 %a	Weekday, short version	Wed	
@@ -84,7 +85,9 @@ class Log:
             for line in f:
                 print(line, end="")
                 line = line.strip('[]')
-                dirs: list[str] = line.split('][')
+                dirs: list[str] = findall("\[[^]]*\]", line)
+                # TODO: sum shit up, create dt objects ()
+                # add log format specifiers
 
 
     def s_time(self,   
@@ -121,7 +124,7 @@ class Log:
     #
         cwd_dir: str = gwd()
         time_: str = self.s_time(time_format = t_format)
-        log_line: str = f"[{log_type}][{state}][{time_}][{user}][{project}][{cwd_dir}]\n"
+        log_line: str = f"[{log_type}][{state}][{time_}]\t[{user}]/[{project}]@[{cwd_dir}]\n"
         return log_line
 
     def log(self, path: str = "", filename = "", log_line: str = ""):
