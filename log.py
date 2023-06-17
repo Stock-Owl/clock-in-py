@@ -1,5 +1,8 @@
 from datetime import datetime as dt
 from datetime import timedelta as tdelta
+from datetime import time as t
+from datetime import date as d
+# 
 from os.path import dirname
 from os import getcwd as gwd
 from re import findall
@@ -39,21 +42,28 @@ from re import findall
 
 class Log:
     """
-    I should write a class description here... hehehe
+    File Logger
     """
+    info: dict[str, list[str]] = {
+        "time_sum": ["time_cap", "path"],
+        "log_sum": ["path"],
+        "log": ["path", "filename", "log_line", "log_type", "state", "user", "project", "t_format"]
+    }
+
     def __init__(self,
                  user: str = "",
                  project: str = "",
                  log_type: str = "LOG",
                  state: str = "",
-                 log_path: str = "./tlog/",
+                 log_path: str = "./tlog",
                  log_filename: str = ""):
 
         """
         Initializes a Log object all values are set to 'N/A' unless
-        specified in arguments of the initializer except path and filename
-        """
+        specified in arguments of the initializer except path and filename\n
 
+        """
+        # TODO: extended description for arguments in the initializer intellisense description
         self.user: str = "N/A" if user == "" else user
         self.state: str = "N/A" if state == "" else state
         self.project: str = "N/A" if project == "" else project
@@ -65,16 +75,59 @@ class Log:
             if log_filename == "" else f"{log_filename}.tlog"
         # NOT a class attribute (because fuck you, that's why)
         full_path: str = f"{self.log_path}/{self.log_filename}"
+        self.date_format = "%d/%m/%Y"
+        # TODO: make file for logs if none is available
+        try:
+            f = open(full_path, "x", encoding="utf-8")
+            f.close()
+        except FileExistsError:
+            with open(full_path, "a+", encoding="utf-8") as f:
+                if f.readline == "":
+                    f.write(f"——————{d.today().strftime(self.date_format)}——————")
 
-        with open(full_path, mode = 'w+', encoding = "utf-8") as f:
-            pass
-    def t_sum():
-        ...
+    def time_sum(self, path: str = "", time_cap: tdelta = tdelta.max) -> tdelta:
 
-    def l_sum(self, path: str = "") -> \
-        tuple[tuple[str, int | dt], ...]:
-        """Sums up hours logged by each user and returns a 2d tuple storing the sums and users in pairs (tuple(tuple))
+        """
+        Sums up the passed time between START and END logs. Ignores TEST logs and others.\n
+        The path of the log file by default is the path of the Log object\n
+        `time_cap` allows for the setting of a maximum time that can be returned.\n
+        By default it's set to timedelta.max `timedelta(days=999999999, hours=23, minutes=59, seconds=59, microseconds=999999)`\n
+        Why is this useful? For example, if you only work 8 hours a day and get payed for 8 hours max,
+        then any overtime is uncompensated, but the logs add up to more than 8 hours, you can set
+        the maximum to 8 hours so it can't return more.
+        """
+
+        if path == "":
+            path = f"{self.log_path}/{self.log_filename}"
+        today: d = d.today()
         
+        with open(path, mode = 'r+', encoding='utf-8') as f:
+            diffs: list[tdelta] = []
+            for line in f:
+                start: dt
+                end: dt
+                dirs: list[str] = findall("\[[^]]*\]", line)
+                for i in range(len(dirs)):
+                    dirs[i] = dirs[i].strip("[]")
+                 
+                if dirs[1] == "START":
+                    start = dt.combine(today, t.fromisoformat(dirs[2]))
+                elif dirs[1] == "END":
+                    end = dt.combine(today, t.fromisoformat(dirs[2]))
+                    diffs.append(end - start)
+                    del start, end
+
+            sum_t: tdelta = diffs[0]
+            for each in diffs[1:]:
+                sum_t = sum_t + each
+
+            if sum_t > time_cap: sum_t = time_cap
+        return sum_t
+
+    def log_sum(self, path: str = "") -> \
+        tuple[tuple[str, int | dt], ...]:
+        """Sums up hours logged by each user and returns a 2d tuple storing the sums and users in pairs (tuple(tuple))\n
+        # Still W.I.P., DO NOT USE!\n
         Requires a path to the *.tlog file"""
 
         if path == "": path = f"{self.log_path}/{self.log_filename}"
@@ -83,14 +136,15 @@ class Log:
         # (hence: tuple(tuple)), first: user second: summed time
         sum_: tuple[tuple[str, dt | int], ...]
         with open(path, mode = 'r+', encoding='utf-8') as f:
+            temp: dt
             for line in f:
                 print(line, end="")
                 line = line.strip('[]')
                 dirs: list[str] = findall("\[[^]]*\]", line)
                 # TODO: sum shit up, create dt objects ()
                 # add log format specifiers
+                
         return (("", 0))    # some tomfoolery
-
 
     def s_time(self,
                 time_format: str = r"%Y-%%d %H:%M:",
@@ -123,19 +177,20 @@ class Log:
         if state == "": state = self.state
         if user == "": user = self.user
         if project == "": project = self.project
-    #
+    #TODO: make it so any number of parameters can be passed into the function as a dictionary
+    # which can be unpacked and utilized by the log line format. This allows for custom log formats and paraeters.
         cwd_dir: str = gwd()
         time_: str = self.s_time(time_format = t_format)
         log_line: str = f"[{log_type}][{state}][{time_}]\t[{user}]/[{project}]@[{cwd_dir}]\n"
         return log_line
 
-    def log(self, path: str = "", filename = "", log_line: str = ""):
+    def log(self, path: str = "", filename = "", log_line: str = "", **mk_args):
         """writes log line into specifies .tlog file. Makes a log line if none is given"""
         if path == "":
             path = self.log_path    #defaults to predefined path './tlog/'
-        if filename == "":
-            filename = self.log_filename    #defaults to predefined filename '[current date].tlog'
-        if log_line == "":
+        if len(mk_args) != 0:
+            log_line =  self.mk_log_line(**mk_args)
+        elif log_line == "":
             log_line = self.mk_log_line(self.log_type, self.state, self.user, self.project)
         full_path = f"{path}/{filename}"
         with open(full_path, mode = "a+", encoding = "utf8") as f:
