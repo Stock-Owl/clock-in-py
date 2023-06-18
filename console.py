@@ -42,7 +42,7 @@ def config(prop: str, value: str) -> None:
         print(f"{prop}: {cfg[prop]} -> {value}")
         cfg[prop] = value
     with open("./config.json", mode = 'w', encoding="utf8") as f:
-        f.write(dumps(cfg, indent = 1))
+        f.write(dumps(cfg, indent = 2))
 
 def cls() -> None:
     system("cls")
@@ -62,7 +62,7 @@ def load_config() -> None:
                 cfg["state"] = "END"
             elif log_state == "END":
                 cfg["state"] = "START"
-            f.write(dumps(cfg, indent = 1))
+            f.write(dumps(cfg, indent = 2))
 
     except FileNotFoundError:
         print("Couldn't find config file. Restoring to defaults")
