@@ -1,9 +1,7 @@
 {
-    "name": "terminal",
-    "log":{
-        "project": "",
-        "user": "",
-        "status": ""
-    },
-    "": ""
+ "name": "cmd",
+ "project": "myproject",
+ "user": "self",
+ "state": "START",
+ "type": "LOG"
 }

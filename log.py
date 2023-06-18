@@ -192,6 +192,8 @@ class Log:
             log_line =  self.mk_log_line(**mk_args)
         elif log_line == "":
             log_line = self.mk_log_line(self.log_type, self.state, self.user, self.project)
+        if filename == "":
+            filename = self.log_filename
         full_path = f"{path}/{filename}"
         with open(full_path, mode = "a+", encoding = "utf8") as f:
             f.write(log_line)
