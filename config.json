@@ -1,7 +1,7 @@
 {
- "name": "cmd",
- "project": "myproject",
- "user": "self",
- "state": "START",
- "type": "LOG"
+  "name": "logger",
+  "project": "myproject",
+  "user": "self",
+  "state": "START",
+  "type": "LOG"
 }
